@@ -1,0 +1,191 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f3;
+  color: #1a1a1a;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.wrap {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Header */
+header {
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Input area */
+.input-area {
+  margin-bottom: 1.5rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  font-size: 15px;
+  font-family: inherit;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #1a1a1a;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: #999;
+}
+
+textarea::placeholder {
+  color: #aaa;
+}
+
+textarea.error {
+  border-color: #e24b4a;
+}
+
+.char-count {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 6px;
+  text-align: right;
+}
+
+button {
+  margin-top: 12px;
+  padding: 11px 24px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+button:hover {
+  background: #f0f0ee;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e8e8e6;
+  padding: 14px 16px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.stat-val {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Result card */
+.result-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e6;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.result-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.vibe-label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.vibe-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #ebebeb;
+  margin: 1.25rem 0;
+}
+
+/* Trait pills */
+.trait-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.trait-pill {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f5f5f3;
+  color: #555;
+  border: 1px solid #e0e0de;
+}
+
+/* Utility */
+.hidden {
+  display: none;
+}

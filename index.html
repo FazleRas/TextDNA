@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TextDNA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="wrap">
+    <header>
+      <h1>TextDNA</h1>
+      <p class="subtitle">Paste or Type anything and see what it says about you.</p>
+    </header>
+
+    <div class="input-area">
+      <textarea id="inputText" placeholder="Example: I love ice cream!"></textarea>
+      <div class="char-count" id="charCount">0 characters</div>
+      <button id="analyzeBtn" onclick="analyze()">Decode my TextDNA</button>
+    </div>
+
+    <div id="output" class="hidden">
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="result-card" id="resultCard">
+        <p class="result-header">Your TextDNA profile</p>
+        <p class="vibe-label" id="vibeLabel"></p>
+        <p class="vibe-desc" id="vibeDesc"></p>
+        <hr class="divider" />
+        <div class="trait-list" id="traitList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
