@@ -4,35 +4,218 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TextDNA</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f3;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .wrap { max-width: 680px; margin: 0 auto; }
+
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .subtitle { font-size: 15px; color: #666; line-height: 1.5; margin-bottom: 2rem; }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      font-size: 15px;
+      font-family: inherit;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1.5px solid #ddd;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.15s;
+      display: block;
+    }
+    textarea:focus { border-color: #999; }
+    textarea::placeholder { color: #aaa; }
+    textarea.error { border-color: #e24b4a; }
+
+    .char-count { font-size: 12px; color: #aaa; margin-top: 6px; text-align: right; }
+
+    button {
+      margin-top: 12px;
+      padding: 11px 24px;
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1.5px solid #ccc;
+      background: #fff;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: inline-block;
+    }
+    button:hover { background: #ebebeb; }
+    button:active { transform: scale(0.98); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin: 1.5rem 0 1.25rem;
+    }
+
+    .stat-card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e6; padding: 14px 16px; }
+    .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .stat-val { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+
+    .result-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e6; padding: 1.5rem; margin-bottom: 2rem; }
+    .result-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 10px; }
+    .vibe-label { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .vibe-desc { font-size: 14px; color: #555; line-height: 1.7; }
+
+    .divider { border: none; border-top: 1px solid #ebebeb; margin: 1.25rem 0; }
+
+    .trait-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .trait-pill { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #f5f5f3; color: #555; border: 1px solid #e0e0de; }
+
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
 
-  <div class="wrap">
-    <header>
-      <h1>TextDNA</h1>
-      <p class="subtitle">Paste or Type anything and see what it says about you.</p>
-    </header>
+<div class="wrap">
+  <h1>TextDNA</h1>
+  <p class="subtitle">Paste anything you've typed — a text, a rant, an email draft. We'll decode what it says about you.</p>
 
-    <div class="input-area">
-      <textarea id="inputText" placeholder="Example: I love ice cream!"></textarea>
-      <div class="char-count" id="charCount">0 characters</div>
-      <button id="analyzeBtn" onclick="analyze()">Decode my TextDNA</button>
-    </div>
+  <textarea id="inputText" placeholder="idk man i guess ill try it later..."></textarea>
+  <div class="char-count" id="charCount">0 characters</div>
+  <button id="analyzeBtn">Decode my TextDNA</button>
 
-    <div id="output" class="hidden">
-      <div class="stats-grid" id="statsGrid"></div>
-
-      <div class="result-card" id="resultCard">
-        <p class="result-header">Your TextDNA profile</p>
-        <p class="vibe-label" id="vibeLabel"></p>
-        <p class="vibe-desc" id="vibeDesc"></p>
-        <hr class="divider" />
-        <div class="trait-list" id="traitList"></div>
-      </div>
+  <div id="output" class="hidden">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="result-card">
+      <p class="result-header">Your TextDNA profile</p>
+      <p class="vibe-label" id="vibeLabel"></p>
+      <p class="vibe-desc" id="vibeDesc"></p>
+      <hr class="divider" />
+      <div class="trait-list" id="traitList"></div>
     </div>
   </div>
+</div>
 
-  <script src="script.js"></script>
+<script>
+  var ta = document.getElementById('inputText');
+  var btn = document.getElementById('analyzeBtn');
+  var charCount = document.getElementById('charCount');
+  var output = document.getElementById('output');
+
+  ta.addEventListener('input', function() {
+    charCount.textContent = ta.value.length + ' characters';
+  });
+
+  btn.addEventListener('click', function() {
+    var raw = ta.value.trim();
+
+    if (raw.length < 10) {
+      ta.classList.add('error');
+      setTimeout(function() { ta.classList.remove('error'); }, 800);
+      return;
+    }
+
+    var words = raw.match(/\b\w+\b/g) || [];
+    var sentences = raw.split(/[.!?]+/).map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+    var totalChars = words.reduce(function(a, w) { return a + w.length; }, 0);
+
+    var avgWordLen = words.length ? (totalChars / words.length) : 0;
+    var avgSentLen = sentences.length ? (words.length / sentences.length) : 0;
+
+    var ellipsis     = (raw.match(/\.\.\./g) || []).length;
+    var allCaps      = (raw.match(/\b[A-Z]{2,}\b/g) || []).length;
+    var exclamations = (raw.match(/!/g) || []).length;
+    var questions    = (raw.match(/\?/g) || []).length;
+    var commas       = (raw.match(/,/g) || []).length;
+    var noPunct      = !raw.match(/[.!?,;]/);
+    var lowercase    = raw === raw.toLowerCase();
+    var longWords    = words.filter(function(w) { return w.length >= 8; }).length;
+    var shortWords   = words.filter(function(w) { return w.length <= 3; }).length;
+    var hedges       = (raw.match(/\b(idk|maybe|kinda|sorta|guess|probably|perhaps|might|like|literally)\b/gi) || []).length;
+    var filler       = (raw.match(/\b(um|uh|like|well|so|okay|ok|right)\b/gi) || []).length;
+
+    var stats = [
+      { label: 'Words',              val: words.length },
+      { label: 'Sentences',          val: sentences.length },
+      { label: 'Avg words/sentence', val: avgSentLen.toFixed(1) },
+      { label: 'Avg word length',    val: avgWordLen.toFixed(1) + ' chars' }
+    ];
+
+    var traits = [];
+    if (ellipsis >= 2)                              traits.push('hesitates a lot');
+    if (allCaps >= 2)                               traits.push('very emphatic');
+    if (exclamations >= 3)                          traits.push('enthusiastic');
+    if (questions >= 3)                             traits.push('always questioning');
+    if (hedges >= 3)                                traits.push('noncommittal');
+    if (filler >= 3)                                traits.push('thinks out loud');
+    if (noPunct)                                    traits.push('no time for punctuation');
+    if (lowercase)                                  traits.push('casual typer');
+    if (avgSentLen < 7)                             traits.push('blunt and direct');
+    if (avgSentLen > 20)                            traits.push('over-explainer');
+    if (longWords / words.length > 0.2)             traits.push('vocabulary flex');
+    if (shortWords / words.length > 0.65)           traits.push('simple communicator');
+    if (commas > 5)                                 traits.push('stream of consciousness');
+    if (sentences.length === 1 && words.length > 30) traits.push('needs to breathe');
+
+    var vibeLabel, vibeDesc;
+
+    if (ellipsis >= 3 && hedges >= 2) {
+      vibeLabel = 'The Chronic Hesitator';
+      vibeDesc  = "You type like you're texting someone you're not sure likes you back. Every sentence trails off into possibility. You've probably rewritten this three times.";
+    } else if (allCaps >= 3 || exclamations >= 4) {
+      vibeLabel = 'Chaotic Energy Type';
+      vibeDesc  = "You communicate at full volume. No context, no chill. People either love getting messages from you or mute you — no in between.";
+    } else if (noPunct && lowercase) {
+      vibeLabel = 'Chronically Online';
+      vibeDesc  = "Punctuation is for formal people and you're not one of them. You type how you think — fast, lowercase, unfiltered. Zero drafts. One send.";
+    } else if (avgSentLen < 6) {
+      vibeLabel = 'The Two-Word Texter';
+      vibeDesc  = "Short. Blunt. Efficient. You probably respond with 'ok' to paragraphs and feel fine about it. You don't explain yourself — others should keep up.";
+    } else if (avgSentLen > 22) {
+      vibeLabel = 'The Over-Explainer';
+      vibeDesc  = "You type like every message could be misunderstood, so you add just one more sentence to clarify. Then another. Then a disclaimer. It's a lot, but you mean well.";
+    } else if (hedges >= 4) {
+      vibeLabel = 'The Maybe Person';
+      vibeDesc  = "You can't commit to a statement without softening it. 'Maybe,' 'kinda,' 'I guess' — you leave every door open. Great for flexibility. Exhausting for decisions.";
+    } else if (words.length && longWords / words.length > 0.25) {
+      vibeLabel = 'Secretly a Nerd';
+      vibeDesc  = "You use words that other people have to look up. You probably correct people's spelling in your head (and sometimes out loud). We see you.";
+    } else if (commas > 6 && sentences.length <= 2) {
+      vibeLabel = 'Stream of Consciousness';
+      vibeDesc  = "Your thoughts arrive in a continuous river with no natural stopping points, you just keep going, adding more, one idea into the next, which is fine, actually kind of poetic.";
+    } else if (questions >= 3) {
+      vibeLabel = 'The Overthinker';
+      vibeDesc  = "You can't just say a thing — you have to interrogate it. Are you sure? But what does it mean? What if you're wrong? This is also your inner monologue, isn't it.";
+    } else {
+      vibeLabel = 'Balanced Communicator';
+      vibeDesc  = "You write clearly, without chaos. Normal sentence length, reasonable punctuation, no red flags. Either you're well-adjusted or very good at hiding it.";
+    }
+
+    document.getElementById('statsGrid').innerHTML = stats.map(function(s) {
+      return '<div class="stat-card"><p class="stat-label">' + s.label + '</p><p class="stat-val">' + s.val + '</p></div>';
+    }).join('');
+
+    document.getElementById('vibeLabel').textContent = vibeLabel;
+    document.getElementById('vibeDesc').textContent  = vibeDesc;
+
+    var tl = document.getElementById('traitList');
+    tl.innerHTML = traits.length
+      ? traits.map(function(t) { return '<span class="trait-pill">' + t + '</span>'; }).join('')
+      : '<span class="trait-pill">no strong signals detected</span>';
+
+    output.classList.remove('hidden');
+    output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+</script>
+
 </body>
 </html>
